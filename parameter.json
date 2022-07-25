@@ -24,6 +24,34 @@
     "ParameterValue": "archive"
   },
   {
+    "ParameterKey": "pRedshiftDataFolder",
+    "ParameterValue": "redshift_data"
+  },
+  {
+    "ParameterKey": "pRedshiftClusterIdentifier",
+    "ParameterValue": "cluster_id"
+  },
+  {
+    "ParameterKey": "pRedshiftDBHost",
+    "ParameterValue": "host"
+  },
+  {
+    "ParameterKey": "pRedshiftDBName",
+    "ParameterValue": "dbname"
+  },
+  {
+    "ParameterKey": "pRedshiftDBUser",
+    "ParameterValue": "dbuser"
+  },
+  {
+    "ParameterKey": "pRedshiftTableName",
+    "ParameterValue": "tablename"
+  },
+  {
+    "ParameterKey": "pRedshiftIAMRole",
+    "ParameterValue": "iam_role"
+  },
+  {
     "ParameterKey": "pEmailforNotification",
     "ParameterValue": "valid-email@xyz.com"
   },

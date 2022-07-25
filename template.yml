@@ -24,6 +24,41 @@ Parameters:
     Description: "Folder to store archived dataset"
     Default: "archive"
 
+  pRedshiftDataFolder:
+    Type: String
+    Description: "Folder to store validated dataset for RedShift"
+    Default: "redshift_data"
+
+  pRedshiftClusterIdentifier:
+    Type: String
+    Description: "RedShift Cluster Identifier"
+    Default: "cluster_id"
+
+  pRedshiftDBHost:
+    Type: String
+    Description: "RedShift Database Hostname"
+    Default: "host"
+
+  pRedshiftDBName:
+    Type: String
+    Description: "RedShift Database Name"
+    Default: "dbname"
+
+  pRedshiftDBUser:
+    Type: String
+    Description: "RedShift Database User"
+    Default: "dbuser"
+
+  pRedshiftTableName:
+    Type: String
+    Description: "RedShift Table Name"
+    Default: "tablename"
+
+  pRedshiftIAMRole:
+    Type: String
+    Description: "RedShift IAM Role"
+    Default: "iam_role"
+
   pErrorFolder:
     Type: String
     Description: "Folder to store dataset for any error"
@@ -56,7 +91,7 @@ Resources:
     Properties:
       ServiceToken: !GetAtt LambdaFunctionS3Object.Arn
       the_bucket: !Ref S3Bucket
-      dirs_to_create: !Join [ ",", [!Ref pSourceFolder,!Ref pStageFolder,!Ref pErrorFolder,!Ref pArchiveFolder,!Ref pTransformFolder]]
+      dirs_to_create: !Join [ ",", [!Ref pSourceFolder,!Ref pStageFolder,!Ref pErrorFolder,!Ref pArchiveFolder,!Ref pRedshiftDataFolder,!Ref pTransformFolder]]
       file_prefix: "glue/gluejob.py"
       file_content: !Sub |
         import sys
@@ -170,6 +205,7 @@ Resources:
                 - echo "s3fs" >> requirements.txt
                 - echo "pytz" >> requirements.txt
                 - echo "cerberus" >> requirements.txt
+                - echo "psycopg2" >> requirements.txt
                 - pip install -r requirements.txt -t ./build/python
                 - cd ./build && zip -r ../temp.zip .
                 - pwd
@@ -402,7 +438,14 @@ Resources:
       Environment:
         Variables:
           archive_folder_name: !Ref pArchiveFolder
+          redshift_data_folder_name: !Ref pRedshiftDataFolder
           error_folder_name: !Ref pErrorFolder
+          cluster_id: !Ref pRedshiftClusterIdentifier
+          host: !Ref pRedshiftDBHost
+          dbname: !Ref pRedshiftDBName
+          dbuser: !Ref pRedshiftDBUser
+          tablename: !Ref pRedshiftTableName
+          iam_role: !Ref pRedshiftIAMRole
 
   StartStepFunction:
     Type: AWS::Serverless::Function
@@ -745,7 +788,7 @@ Resources:
                         {
                             "Variable": "$.taskresult.Status",
                             "StringEquals": "READY",
-                            "Next": "Move file to archive"
+                            "Next": "Move file to redshift_data and archive"
                         },
                         {
                             "Variable": "$.taskresult.Status",
@@ -770,7 +813,7 @@ Resources:
                     "Cause": "validation failed",
                     "Error": "ValidationError"
                 },
-                "Move file to archive": {
+                "Move file to redshift_data and archive": {
                     "Type": "Task",
                     "Resource": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${ArchiveFunction}",
                     "Next": "Success Notification"
