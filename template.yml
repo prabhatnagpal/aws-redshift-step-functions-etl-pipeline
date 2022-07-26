@@ -205,7 +205,6 @@ Resources:
                 - echo "s3fs" >> requirements.txt
                 - echo "pytz" >> requirements.txt
                 - echo "cerberus" >> requirements.txt
-                - echo "psycopg2" >> requirements.txt
                 - pip install -r requirements.txt -t ./build/python
                 - cd ./build && zip -r ../temp.zip .
                 - pwd
@@ -430,6 +429,8 @@ Resources:
   ArchiveFunction:
     Type: AWS::Serverless::Function
     Properties:
+      Layers:
+        - arn:aws:lambda:ap-south-1:898466741470:layer:psycopg2-py37:1
       Role: !GetAtt LambdaRole.Arn
       Handler: move_file.lambda_handler
       CodeUri: lambda
