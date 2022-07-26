@@ -61,7 +61,7 @@ def lambda_handler(event, context):
     elif status == "SUCCESS":
         print("Status is set to archive. Moving to data and archive folder")
         folder = os.environ['archive_folder_name']
-        redshift_data_folder = os.environ['data_folder_name']
+        redshift_data_folder = os.environ['redshift_data_folder_name']
     source_file_name_to_copy = bucket_name + "/" + source_location + "/" + file_name
     move_file_name = folder + "/" + file_name
     move_redshift_file_name = redshift_data_folder + "/" + file_name
